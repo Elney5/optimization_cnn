@@ -46,15 +46,15 @@ class APoZ_Algorithm:
         print("Analyzing layers for APoZ calculation...")
 
         # Extraire les images `x` du dataset
-        images = tf.concat([batch[0] for batch in self.data], axis=0)
-
-        # Vérifier la forme des données
-        assert len(images.shape) == 4, f"Expected 4D input, but got shape {images.shape}"
-        print(f"Number of input images: {images.shape[0]}")
-
-        # Normaliser les images
-        images = tf.cast(images, tf.float32) / 255.0
-        print("Normalized input data.")
+        # images = tf.concat([batch[0] for batch in self.data], axis=0)
+        #
+        # # Vérifier la forme des données
+        # assert len(images.shape) == 4, f"Expected 4D input, but got shape {images.shape}"
+        # print(f"Number of input images: {images.shape[0]}")
+        #
+        # # Normaliser les images
+        # images = tf.cast(images, tf.float32) / 255.0
+        # print("Normalized input data.")
 
         # Vérifier l'activation_model
         print("Activation model summary:")
@@ -63,7 +63,9 @@ class APoZ_Algorithm:
 
         # Obtenir les activations intermédiaires pour toutes les images
         print("Extracting activations from the model...")
-        activations = self.activation_model.predict(images, verbose=1)
+        self.data = self.data = self.data.take(100)  # Prendre les 100 premiers échantillons
+  # Utiliser uniquement les 100 prem
+        activations = self.activation_model.predict(self.data)
 
         # Vérifier que les activations ont été générées
         if not isinstance(activations, list) or len(activations) == 0:
