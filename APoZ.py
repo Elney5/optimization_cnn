@@ -63,8 +63,9 @@ class APoZ_Algorithm:
 
         # Obtenir les activations intermédiaires pour toutes les images
         print("Extracting activations from the model...")
-        self.data = self.data = self.data.take(100)  # Prendre les 100 premiers échantillons
-  # Utiliser uniquement les 100 prem
+        self.data = self.data = self.data.take(3)  # Prendre les 100 premiers échantillons
+        print(f"Number of samples: {len(self.data)}")
+        # Utiliser uniquement les 100 prem
         activations = self.activation_model.predict(self.data)
 
         # Vérifier que les activations ont été générées

@@ -1,18 +1,6 @@
 import numpy as np
 def getmask(layers, mask, maskflatten, mask_type='min', percentile=0.2, printactivation=False, dropOne=False):
-    """ Updates mask after each training cycle
-    Inputs:
-    layers - Predicted node value per layer
-    mask - current mask
-    mask_type - type of mask: min, max, random, min_layer, max_layer, random_layer, apoz, apoz_layer
-    maskflatten - Flattened masked indices per layer (1 for mask, 0 for no mask)
-    percentile - percentage of nodes remaining to be masked
-    printactivation - Boolean. Whether to print the activations per layer
-    dropOne - Boolean. Whether to drop only one node/filter at a time
 
-    Output:
-    mask - final masks after masking percentile proportion of remaining nodes
-    """
     nodevalues = []
     layermeans = {}
 
@@ -94,38 +82,11 @@ def getmask(layers, mask, maskflatten, mask_type='min', percentile=0.2, printact
         # only if there is something to drop in current mask
         if (np.sum(mask[i]) > 0):
             # Have different indices for different masks
-            if mask_type == 'max' or mask_type == 'apoz':
+            if mask_type == 'apoz':
                 indices = np.ravel(np.where(layermean >= maxindex))
                 curindices = np.ravel(np.where(mask[i].ravel()))
                 indices = [j for j in indices if j in curindices]
-            # global random mask or layer random mask
-            elif mask_type == 'random_layer':
-                indices = np.ravel(np.where(mask[i].ravel()))
-                curindices = np.ravel(np.where(mask[i].ravel()))
-            elif mask_type == 'random':
-                indices = dropmaskindex[i]
-                curindices = np.ravel(np.where(mask[i].ravel()))
-            # layer-wise max mask
-            elif mask_type == 'max_layer' or mask_type == 'apoz_layer':
-                sortedvalues = -np.sort(-layermean[mask[i] == 1])
-                index = int((percentile) * len(sortedvalues))
-                maxindex = sortedvalues[index]
-                indices = np.ravel(np.where(layermean >= maxindex))
-                curindices = np.ravel(np.where(mask[i].ravel()))
-                indices = [j for j in indices if j in curindices]
-            # layer-wise min mask
-            elif mask_type == 'min_layer':
-                sortedvalues = np.sort(layermean[mask[i] == 1])
-                index = int((percentile) * len(sortedvalues))
-                maxindex = sortedvalues[index]
-                indices = np.ravel(np.where(layermean <= maxindex))
-                curindices = np.ravel(np.where(mask[i].ravel()))
-                indices = [j for j in indices if j in curindices]
-            # if this is min mask or % based mask
-            else:
-                indices = np.ravel(np.where(layermean <= maxindex))
-                curindices = np.ravel(np.where(mask[i].ravel()))
-                indices = [j for j in indices if j in curindices]
+
 
         else:
             # default
@@ -148,7 +109,7 @@ def getmask(layers, mask, maskflatten, mask_type='min', percentile=0.2, printact
 
         if (len(indices) > 0):
 
-            # remove at most totalnodes number of nodes
+            # remove at most total nodes number of nodes
             if (len(indices) > totalnodes):
                 indices = indices[:totalnodes]
 
