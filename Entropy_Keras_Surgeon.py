@@ -8,26 +8,10 @@ class EntropyPruningSurgeon:
     Classe pour effectuer le pruning basé sur l'entropie d'un modèle Keras.
     """
     def __init__(self, model, threshold):
-        """
-        Initialise l'objet avec le modèle et le seuil d'entropie.
-
-        Args:
-            model (tf.keras.Model): Le modèle Keras à pruner.
-            threshold (float): Le seuil d'entropie en-dessous duquel les filtres seront supprimés.
-        """
         self.model = model
         self.threshold = threshold
 
     def calculate_entropy(self, layer):
-        """
-        Calcule l'entropie des filtres d'une couche convolutive.
-
-        Args:
-            layer (tf.keras.layers.Conv2D): La couche à analyser.
-
-        Returns:
-            np.ndarray: Les entropies des filtres.
-        """
         weights, _ = layer.get_weights()
         num_filters = weights.shape[-1]  # Nombre de filtres
 
@@ -42,6 +26,8 @@ class EntropyPruningSurgeon:
         p_i = np.abs(weights) / total_weight_sum
         # Entropie calculée par -∑ p*log(p)
         entropies = -np.sum(p_i * np.log(p_i + 1e-10), axis=(0, 1, 2))  # Ajout de 1e-10 pour éviter log(0)
+        print(entropies)
+
         return entropies
 
     def prune_model(self):
@@ -58,6 +44,7 @@ class EntropyPruningSurgeon:
                 entropies = self.calculate_entropy(layer)
                 # Indices des filtres à supprimer
                 pruned_indices = [i for i, e in enumerate(entropies) if e < self.threshold]
+                print(f"Pruned indices for layer '{layer.name}': {pruned_indices}")
 
                 # Vérifier que tous les filtres ne sont pas supprimés
                 num_filters = entropies.shape[0]
