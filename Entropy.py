@@ -2,6 +2,7 @@ import numpy as np
 import tf_keras
 from tf_keras import layers,initializers
 from tf_keras.models import Sequential
+from tf2kerassurgeon import Surgeon
 
 class EntropyPruning:
     def __init__(self, model, threshold, stability_margin=0.07, pruning_frequency=1, seed=42):
@@ -42,7 +43,7 @@ class EntropyPruning:
         entropies = self.calculate_entropy(layer)
         pruned_indices = [i for i, h in enumerate(entropies) if h < self.threshold]
         if not pruned_indices:
-            return None, prev_output_depth
+            return layer, prev_output_depth
 
         weights, biases = layer.get_weights()
         flatten_weights = weights.flatten()
