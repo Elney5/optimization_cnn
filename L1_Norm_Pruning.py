@@ -1,62 +1,49 @@
-import numpy as np
 import tensorflow as tf
+import numpy as np
 from tf_keras import layers, Model, Input
+import test_surgeon
 from test_surgeon import Surgeon
 
-class EntropyPruningSurgeon:
-    """
-    Classe pour effectuer le pruning basé sur l'entropie d'un modèle Keras.
-    """
+class L1_Norm:
     def __init__(self, model, threshold):
         self.model = model
         self.threshold = threshold
 
-    def calculate_entropy(self, layer):
+    def calculate_L1_norm(self, layer):
         weights, _ = layer.get_weights()
-        num_filters = weights.shape[-1]  # Nombre de filtres
-
         if np.any(np.isnan(weights)) or np.any(np.isinf(weights)):
             raise ValueError("Les poids contiennent des valeurs NaN ou Inf.")
 
-        total_weight_sum = np.sum(np.abs(weights))
-        if total_weight_sum == 0:
-            return np.zeros(num_filters)
-
-        # Probabilité normalisée des poids
-        p_i = np.abs(weights) / total_weight_sum
-        # Entropie calculée par -∑ p*log(p)
-        entropies = -np.sum(p_i * np.log(p_i + 1e-10), axis=(0, 1, 2))  # Ajout de 1e-10 pour éviter log(0)
-        return entropies
+        # Calcul des normes L1 des filtres
+        l1_norms = np.sum(np.abs(weights), axis=(0, 1, 2))  # Calcul L1 pour chaque filtre
+        return l1_norms
 
     def prune_model(self):
-        """
-        Effectue le pruning des filtres basés sur l'entropie.
-
-        Returns:
-            tf.keras.Model: Le modèle pruné.
-        """
         surgeon = Surgeon(self.model)
+
+        # Parcours de toutes les couches du modèle
         for layer in self.model.layers:
             if isinstance(layer, layers.Conv2D):
-                # Calcul des entropies des filtres
-                entropies = self.calculate_entropy(layer)
-                # Indices des filtres à supprimer
-                pruned_indices = [i for i, e in enumerate(entropies) if e < self.threshold]
-                print(f"Pruned indices for layer '{layer.name}': {pruned_indices}")
+                # Calcul des normes L1 des filtres
+                l1_norms = self.calculate_L1_norm(layer)
 
-                # Vérifier que tous les filtres ne sont pas supprimés
-                num_filters = entropies.shape[0]
-                if len(pruned_indices) >= num_filters:
-                    # Supprimer toute la couche
-                    print(f"Suppression complète de la couche '{layer.name}' (tous les filtres).")
-                    surgeon.add_job("delete_layer", layer)
-                else:
-                    # Supprimer uniquement certains filtres
+                # Trouver le filtre avec la plus petite norme L1
+                max_l1_index = np.argmax(l1_norms)
+
+                # Trouver les indices des filtres à supprimer (normes L1 inférieures au seuil)
+                pruned_indices = [i for i, l1 in enumerate(l1_norms) if l1 < self.threshold]
+
+                # Si on doit supprimer tous les filtres, on garde uniquement celui avec la norme L1 la plus grande
+                if len(pruned_indices) >= len(l1_norms):
+                    # On supprime toute la couche sauf le filtre avec la norme L1 la plus grande
+                    pruned_indices.remove(max_l1_index)  # Retirer l'indice du filtre "important"
+                    print(f"Suppression complète de la couche '{layer.name}' sauf le filtre avec la norme L1 la plus élevée.")
                     surgeon.add_job("delete_channels", layer, channels=pruned_indices)
+                else:
+                    # Supprimer les filtres dont la norme L1 est inférieure au seuil
+                    surgeon.add_job("delete_channels", layer, channels=pruned_indices)
+                    print(f"Filtres supprimés dans la couche '{layer.name}'.")
 
-
-
-        # Applique les modifications et retourne un nouveau modèle pruné
         pruned_model = surgeon.operate()
         return pruned_model
 
