@@ -14,6 +14,7 @@ class PruneMetrics:
         Convert the metrics to a pandas DataFrame
         """
         import pandas as pd
-        return pd.DataFrame({"Sparsity": [self.sparsity],
-                             "Validation Loss": [self.val_loss],
-                             "Validation Accuracy": [self.val_accuracy]})
+        return pd.DataFrame({"sparsity": [self.sparsity],
+                             "val_loss": [self.val_loss],
+                             "val_accuracy": [self.val_accuracy]})
+   
