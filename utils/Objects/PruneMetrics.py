@@ -17,4 +17,3 @@ class PruneMetrics:
         return pd.DataFrame({"Sparsity": [self.sparsity],
                              "Validation Loss": [self.val_loss],
                              "Validation Accuracy": [self.val_accuracy]})
-   
