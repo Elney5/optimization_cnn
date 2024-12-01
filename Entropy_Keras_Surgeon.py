@@ -40,16 +40,20 @@ class EntropyPruningSurgeon:
             if isinstance(layer, layers.Conv2D):
                 # Calcul des entropies des filtres
                 entropies = self.calculate_entropy(layer)
+
+                # Trouver le filtre avec la plus petite entropie
+                min_entropy_index = np.argmin(entropies)
+
                 # Indices des filtres à supprimer
                 pruned_indices = [i for i, e in enumerate(entropies) if e < self.threshold]
-                print(f"Pruned indices for layer '{layer.name}': {pruned_indices}")
+
 
                 # Vérifier que tous les filtres ne sont pas supprimés
                 num_filters = entropies.shape[0]
                 if len(pruned_indices) >= num_filters:
                     # Supprimer toute la couche
-                    print(f"Suppression complète de la couche '{layer.name}' (tous les filtres).")
-                    surgeon.add_job("delete_layer", layer)
+                    pruned_indices.remove(min_entropy_index)
+                    surgeon.add_job("delete_channels", layer, channels=pruned_indices)
                 else:
                     # Supprimer uniquement certains filtres
                     surgeon.add_job("delete_channels", layer, channels=pruned_indices)
