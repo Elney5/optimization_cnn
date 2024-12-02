@@ -10,7 +10,7 @@ def plot_entropy_accuracy_threshold(data: pd.DataFrame) -> None:
     plt.grid(None)
     plt.title(
         'Validation accuracy & loss as a function of k% threshold\nfor a `VGG16` dataset trained on `horses_or_humans')
-    ax1.plot(data['sparsity'].values,
+    ax1.plot(data['threshold'].values,
              data['val_accuracy'].values,
              '#008fd5', linestyle='-', label='Pruning Accuracy')
     ax2.plot(data['sparsity'].values,
@@ -20,8 +20,8 @@ def plot_entropy_accuracy_threshold(data: pd.DataFrame) -> None:
     ax1.set_ylabel('Accuracy (%)', color='#008fd5')
     ax2.set_ylabel('Loss (sparse categorical crossentropy)', color='#fc4f30')
     ax1.set_xlabel('Threshold')
-    ax1.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), shadow=True, ncol=2);
-    ax2.legend(loc='upper center', bbox_to_anchor=(0.5, -0.25), shadow=True, ncol=2);
+    ax1.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), shadow=True, ncol=2)
+    ax2.legend(loc='upper center', bbox_to_anchor=(0.5, -0.25), shadow=True, ncol=2)
     plt.savefig('Horses_or_Humans_Entropy_comparisons.png')
 
 
