@@ -6,7 +6,7 @@ class PrunedModel:
     """
     Class to store the pruned model, metrics and logdir
     """
-    def __init__(self, model: Model, metric_dict: PruneMetrics, logdir: str):
+    def __init__(self, model: Model, metrics: PruneMetrics, logdir: str):
         self.model: Model = model
-        self.metrics: PruneMetrics = metric_dict
+        self.metrics: PruneMetrics = metrics
         self.logdir: str = logdir

@@ -1,4 +1,3 @@
-import tensorflow as tf
 import tensorflow_datasets as tfds
 
 
@@ -16,6 +15,3 @@ def load_dataset(dataset_name: str, pourcentage_cross_validation: int) -> tuple:
     num_classes = info.features['label'].num_classes
     class_names = info.features['label'].names
     return train_examples, validation_examples, num_examples, num_classes, class_names
-
-
-

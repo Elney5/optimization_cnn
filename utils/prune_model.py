@@ -6,8 +6,7 @@ import tensorflow_model_optimization as tfmot
 from tensorflow.data import Dataset
 from tf_keras import optimizers, losses, Model
 
-from utils.Objects import PrunedModel, PruneMetrics
-
+from utils.Objects import PrunedModel, PruneMetrics, EntropyPruningSurgeon
 
 
 def unstructured_prune_model(model: Model,
@@ -71,4 +70,34 @@ def unstructured_prune_model(model: Model,
         val_loss=np.round(score[0], 4),
         val_accuracy=np.round(score[1] * 100, 4)
     )
-    return PrunedModel(model=model_for_pruning, metric_dict=metric_dict, logdir=logdir)
+    return PrunedModel(model=model_for_pruning, metrics=metric_dict, logdir=logdir)
+
+
+def entropy_prune_model(model, epochs, threshold, train_data, val_data, batch_size):
+    # Create a tensorboard logfile
+    logdir = tempfile.mkdtemp()
+
+    # Model for pruning
+    entropy_pruning_instance = EntropyPruningSurgeon(model=model, threshold=threshold)
+    model_for_pruning = entropy_pruning_instance.run()
+
+    # Recompile
+    model_for_pruning.compile(optimizer=optimizers.Adam(),
+                              loss=losses.SparseCategoricalCrossentropy(),
+                              metrics=["accuracy"])
+
+    # Fit the model
+    model_for_pruning.fit(train_data,
+                          validation_data=val_data,
+                          batch_size=batch_size,
+                          epochs=epochs)
+
+    # Evaluate the model
+    score = model_for_pruning.evaluate(val_data, verbose=0)
+    metric_dict = {
+        "threshold": threshold,
+        "val_loss": np.round(score[0], 4),
+        "val_accuracy": np.round(score[1] * 100, 4)
+    }
+
+    return PrunedModel(model=model_for_pruning, metrics=metric_dict, logdir=logdir)

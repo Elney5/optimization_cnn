@@ -1,5 +1,4 @@
 import numpy as np
-import tensorflow as tf
 from tf_keras import layers, Model, Input
 from test_surgeon import Surgeon
 
