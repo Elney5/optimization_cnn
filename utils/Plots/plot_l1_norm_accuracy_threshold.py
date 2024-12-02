@@ -10,10 +10,10 @@ def plot_l1_norm_accuracy_threshold(data: pd.DataFrame) -> None:
     plt.grid(None)
     plt.title(
         'Validation accuracy & loss as a function of k% threshold with L1-norm\nfor a `VGG16` dataset trained on `horses_or_humans')
-    ax1.plot(data['threshold'].values,
+    ax1.plot(data['sparsity'].values,
              data['val_accuracy'].values,
              '#008fd5', linestyle='-', label='Pruning Accuracy')
-    ax2.plot(data['threshold'].values,
+    ax2.plot(data['sparsity'].values,
              data['val_loss'].values,
              '#00ff00', linestyle='-', label='Pruning Loss')
 

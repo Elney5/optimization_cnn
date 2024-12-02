@@ -102,12 +102,12 @@ def entropy_prune_model(model, epochs, threshold, train_data, val_data, batch_si
 
     return PrunedModel(model=model_for_pruning, metrics=metric_dict, logdir=logdir)
 
-def l1_norm_prune_model(model,epochs,threshold,train_data,val_data,batch_size):
+def l1_norm_prune_model(model,epochs,sparsity,train_data,val_data,batch_size):
     # Create a tensorboard logfile
     logdir = tempfile.mkdtemp()
 
     # Model for pruning
-    l1_norm_pruning_instance = L1NormPruning(model=model, threshold=threshold)
+    l1_norm_pruning_instance = L1NormPruning(model=model, sparsity = sparsity)
     model_for_pruning = l1_norm_pruning_instance.run()
 
     # Recompile
@@ -124,7 +124,7 @@ def l1_norm_prune_model(model,epochs,threshold,train_data,val_data,batch_size):
     # Evaluate the model
     score = model_for_pruning.evaluate(val_data, verbose=0)
     metric_dict = {
-        "threshold": threshold,
+        "sparsity": sparsity,
         "val_loss": np.round(score[0], 4),
         "val_accuracy": np.round(score[1] * 100, 4)
     }
