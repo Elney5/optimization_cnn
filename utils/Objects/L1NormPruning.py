@@ -4,7 +4,7 @@ from tf_keras import layers, Model, Input
 import test_surgeon
 from test_surgeon import Surgeon
 
-class L1_Norm:
+class L1NormPruning:
     def __init__(self, model, threshold):
         self.model = model
         self.threshold = threshold
