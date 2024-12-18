@@ -4,3 +4,5 @@ from utils.prune_model import unstructured_prune_model, entropy_prune_model, l1_
 from utils.normalize_img import normalize_img
 from utils.load_dataset import load_dataset
 from utils.reformat_image import reformat_image
+from utils.data_augmentation import data_augmentation
+from utils.time_benchmark_tf_lite import benchmark_tflite
