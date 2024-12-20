@@ -1,8 +1,6 @@
-import tensorflow as tf
 import numpy as np
 from tf_keras import layers, Model, Input
-import test_surgeon
-from test_surgeon import Surgeon
+from SurgeonPackage.Surgeon import Surgeon
 
 class L1NormPruning:
     def __init__(self, model, sparsity):

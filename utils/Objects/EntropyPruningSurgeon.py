@@ -1,6 +1,6 @@
 import numpy as np
 from tf_keras import layers, Model, Input
-from test_surgeon import Surgeon
+from SurgeonPackage.Surgeon import Surgeon
 
 class EntropyPruningSurgeon:
     """
